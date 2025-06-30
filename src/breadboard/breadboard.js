@@ -310,7 +310,7 @@ Breadboard.prototype.iterateBatteryPulsePaths = function iterateBatteryPulsePath
     }
 };
 
-Breadboard.prototype.update = function update()
+Breadboard.prototype.update = function update(deltaTime)
 {
     this.frame += 1;
 
@@ -327,6 +327,8 @@ Breadboard.prototype.update = function update()
         }
     }
 
+    var panDir = [0, 0];
+    var zoomDir = 0;
     if (!this.focusComponent)
     {
         if (this.stage.isKeyDown(BaseKeyCodeMap.DELETE) ||
@@ -345,6 +347,31 @@ Breadboard.prototype.update = function update()
             this.stage.isKeyDown(BaseKeyCodeMap.KEY_V))
         {
             this.pasteSelectedObjects();
+        }
+
+        if (this.stage.isKeyDown(BaseKeyCodeMap.KEY_W) || this.stage.isKeyDown(BaseKeyCodeMap.KEY_UP))
+        {
+            panDir[1] = panDir[1] - 1;
+        }
+        if (this.stage.isKeyDown(BaseKeyCodeMap.KEY_S) || this.stage.isKeyDown(BaseKeyCodeMap.KEY_DOWN))
+        {
+            panDir[1] = panDir[1] + 1;
+        }
+        if (this.stage.isKeyDown(BaseKeyCodeMap.KEY_A) || this.stage.isKeyDown(BaseKeyCodeMap.KEY_LEFT))
+        {
+            panDir[0] = panDir[0] - 1;
+        }
+        if (this.stage.isKeyDown(BaseKeyCodeMap.KEY_D) || this.stage.isKeyDown(BaseKeyCodeMap.KEY_RIGHT))
+        {
+            panDir[0] = panDir[0] + 1;
+        }
+        if (this.stage.isKeyDown(BaseKeyCodeMap.KEY_Q))
+        {
+            zoomDir = zoomDir - 1;
+        }
+        if (this.stage.isKeyDown(BaseKeyCodeMap.KEY_E))
+        {
+            zoomDir = zoomDir + 1;
         }
     }
 
@@ -380,7 +407,7 @@ Breadboard.prototype.update = function update()
             this.iterateBatteryPulsePaths(function (pulsePath) { pulsePath.createPulse(1); });
         }
 
-        this.gameStage.update();
+        this.gameStage.update(deltaTime, panDir, zoomDir);
         this.iterateBatteryPulsePaths(function (pulsePath) { pulsePath.updatePulses(that); });
         this.updateComponents();
 

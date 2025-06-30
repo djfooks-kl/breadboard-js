@@ -20,6 +20,7 @@ var App = function ()
 
     this.fps = 30;
     this.intervalId = setInterval(this.update.bind(this), 1000 / this.fps);
+    this.lastTime = Date.now();
 
     var top = 10;
     var left = 10;
@@ -130,6 +131,11 @@ App.prototype.update = function update()
         return;
     }
 
+    var time = Date.now();
+    var deltaTime = time - this.lastTime;
+    deltaTime = Math.min(deltaTime, 0.1);
+    this.lastTime = time;
+
     if (this.loading)
     {
         this.loading = false;
@@ -145,7 +151,7 @@ App.prototype.update = function update()
         this.nextTick = 30;
     }
 
-    this.breadboard.update();
+    this.breadboard.update(deltaTime);
     this.save();
 };
 

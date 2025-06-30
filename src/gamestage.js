@@ -1,4 +1,3 @@
-
 function GameStage(canvas, minX, minY, maxX, maxY)
 {
     this.minX = minX;
@@ -86,7 +85,7 @@ GameStage.prototype.scroll = function scroll(delta)
     this.view[1] += delta[1];
 };
 
-GameStage.prototype.update = function update(deltaTime)
+GameStage.prototype.update = function update(deltaTime, panDir, zoomDir)
 {
     this.zoomVelocity *= 0.8;
     if (Math.abs(this.zoomVelocity) < 0.001)
@@ -94,11 +93,25 @@ GameStage.prototype.update = function update(deltaTime)
         this.zoomVelocity = 0.0;
     }
 
+    if (zoomDir)
+    {
+        var speed = 20 * deltaTime;
+        this.zoomLevel += speed * zoomDir;
+        this.updateZoom();
+    }
+
     var oldZoom = this.zoom;
     this.zoomLevel += this.zoomVelocity;
-    if (this.zoomLevel > 100)
+    var maxZoom = 50;
+    var minZoom = -150;
+    if (this.zoomLevel > maxZoom)
     {
-        this.zoomLevel = 100;
+        this.zoomLevel = maxZoom;
+        this.zoomVelocity = 0;
+    }
+    if (this.zoomLevel < minZoom)
+    {
+        this.zoomLevel = minZoom;
         this.zoomVelocity = 0;
     }
     this.updateZoom();
@@ -118,6 +131,14 @@ GameStage.prototype.update = function update(deltaTime)
     var speed = centerVelocity * (this.zoomVelocity < 0 ? 0.1 : 0.03);
     view[0] += (gameMouse[0] - panelCenter[0]) * speed;
     view[1] += (gameMouse[1] - panelCenter[1]) * speed;
+
+    if (panDir)
+    {
+        var speed = 200 * deltaTime;
+        var centerPan = this.toView([this.center[0] + speed * panDir[0], this.center[1] + speed * panDir[1]]);
+        view[0] += centerPan[0] - panelCenter[0];
+        view[1] += centerPan[1] - panelCenter[1];
+    }
 
     if (this.debugClipping)
     {
