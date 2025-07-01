@@ -1748,10 +1748,20 @@ Breadboard.prototype.onKeyDown = function onKeyDown(key, keyCode)
     {
         this.runSimulation = !this.runSimulation;
     }
-    if (keyCode === 39/*RIGHT*/ || keyCode === 32/*SPACE*/)
+    if (keyCode === BaseKeyCodeMap.KEY_SPACE)
     {
         this.stepSimulation = true;
     }
+
+    if (this.state === Breadboard.state.DRAG)
+    {
+        if (keyCode === BaseKeyCodeMap.KEY_R)
+        {
+            this.rotateComponents();
+            return;
+        }
+    }
+
 
     if (this.onKeyDownFn)
     {

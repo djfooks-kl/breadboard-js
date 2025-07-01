@@ -245,12 +245,12 @@ DebuggerComponent.prototype.getConnections = function getConnections(breadboard)
 
 DebuggerComponent.prototype.onKeyDown = function onKeyDown(breadboard, key, keyCode)
 {
-    if (keyCode === 13)
+    if (keyCode === BaseKeyCodeMap.RETURN)
     {
         breadboard.removeFocus();
         return;
     }
-    if (keyCode === 8)
+    if (keyCode === BaseKeyCodeMap.BACKSPACE)
     {
         if (this.valueSelected)
         {
