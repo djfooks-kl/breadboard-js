@@ -127,6 +127,7 @@ Breadboard.prototype.clear = function clearFn()
 {
     this._connections = {};
     this.componentsList = [];
+    this.dirtyComponents = {};
 
     this.gameStage.clearHitboxes();
 
@@ -309,9 +310,11 @@ Breadboard.createFromJson = function createFromJson(vueapp, stage, top, left, js
 Breadboard.prototype.iterateBatteryPulsePaths = function iterateBatteryPulsePaths(fn)
 {
     var i;
-    for (i = 0; i < this.batteries.length; i += 1)
+    var batteries = this.batteries;
+    var batteriesLength = this.batteries.length;
+    for (i = 0; i < batteriesLength; i += 1)
     {
-        fn(this.batteries[i].pulsePaths[0]);
+        fn(batteries[i].pulsePaths[0]);
     }
 };
 
@@ -413,8 +416,16 @@ Breadboard.prototype.update = function update(deltaTime)
         }
 
         this.gameStage.update(deltaTime, panDir, zoomDir);
-        this.iterateBatteryPulsePaths(function (pulsePath) { pulsePath.updatePulses(that); });
-        this.updateComponents();
+
+        var i;
+        var batteries = this.batteries;
+        var batteriesLength = this.batteries.length;
+        for (i = 0; i < batteriesLength; i += 1)
+        {
+            batteries[i].pulsePaths[0].updatePulses(this);
+        }
+
+        this.updateDirtyComponents();
 
         if (this.dirty)
         {
@@ -423,13 +434,48 @@ Breadboard.prototype.update = function update(deltaTime)
     }
 };
 
-Breadboard.prototype.updateComponents = function updateComponents()
+Breadboard.prototype.setComponentDirty = function setComponentDirty(id)
 {
-    var componentsList = this.componentsList;
+    this.dirtyComponents[id] = true;
+};
+
+Breadboard.prototype.updateDirtyComponents = function updateDirtyComponents()
+{
+    var id;
+    var updatedComponents = {};
+
+    var j;
     var i;
-    for (i = 0; i < componentsList.length; i += 1)
+    var connection;
+    var component;
+    var connections;
+    var dirtyComponents;
+
+    for (i = 0; i < 2; i += 1)
     {
-        componentsList[i].update(this);
+        dirtyComponents = this.dirtyComponents;
+        this.dirtyComponents = {};
+        for (id in dirtyComponents)
+        {
+            if (!dirtyComponents.hasOwnProperty(id) || updatedComponents.hasOwnProperty(id))
+            {
+                continue;
+            }
+            connection = this.getConnection(id);
+            component = connection.component;
+            component.update(this);
+
+            connections = component.getConnections(this);
+            for (j = 0; j < connections.length; j += 1)
+            {
+                updatedComponents[j] = true;
+            }
+        }
+    }
+
+    for (id in this.dirtyComponents)
+    {
+        throw new Error("update updating updates that update stuff i dont know...");
     }
 };
 
@@ -1412,6 +1458,9 @@ Breadboard.prototype.addComponent = function addComponent(component)
 
     this.gameStage.addHitbox(component.hitbox);
     this.geometryDirty = true;
+
+    var p = component.getPosition();
+    this.setComponentDirty(this.getIndex(p[0], p[1]));
     return true;
 };
 
