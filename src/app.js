@@ -150,10 +150,11 @@ App.prototype.update = function update()
     {
         this.gameTick += 1;
         this.updateGame();
-        this.nextTick = 30;
+        this.nextTick = 3;
     }
 
     this.breadboard.update(deltaTime);
+    this.breadboard.draw();
     this.save();
 };
 

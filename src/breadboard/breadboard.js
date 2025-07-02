@@ -421,7 +421,6 @@ Breadboard.prototype.update = function update(deltaTime)
             this.dirty = false;
         }
     }
-    this.draw();
 };
 
 Breadboard.prototype.updateComponents = function updateComponents()
