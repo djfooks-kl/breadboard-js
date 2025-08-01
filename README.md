@@ -3,7 +3,7 @@ Build a breadboard computer in a game format
 
 Try it here:
 
-https://djfooks.github.io/breadboard/
+https://djfooks-kl.github.io/breadboard-js/
 
 Change log:
 
